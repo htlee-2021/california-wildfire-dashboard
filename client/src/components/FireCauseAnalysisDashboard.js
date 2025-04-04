@@ -18,9 +18,9 @@ export const FireCauseAnalysisDashboard = ({
 
     useEffect(() => {
         if (topCauses && topCauses.length > 0) {
-            createTopCausesChart();
+          createTopCausesChart();
         }
-    }, [topCauses, showAllCauses]);
+      }, [topCauses, showAllCauses, createTopCausesChart]);
 
     useEffect(() => {
         if (causesData && selectedYear && causesData[selectedYear]) {

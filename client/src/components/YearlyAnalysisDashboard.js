@@ -20,7 +20,7 @@ export const EnhancedYearlyAnalysisDashboard = ({
     if (monthlyData.length > 0) {
       createCharts();
     }
-  }, [monthlyData, selectedYear]);
+  }, [monthlyData, selectedYear, createCharts]);
 
   // Format large numbers
   const formatLargeNumber = (num) => {

@@ -471,7 +471,7 @@ export const MainDashboard = ({ summaryStats, yearlyData, onRefresh }) => {
     if (yearlyData.length > 0) {
       createCharts();
     }
-  }, [yearlyData]);
+  }, [yearlyData, createCharts]);
 
   return (
     <div className="main-dashboard">

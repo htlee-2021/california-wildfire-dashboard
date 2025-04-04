@@ -234,9 +234,10 @@ const FireDashboardSystem = ({ containerId }) => {
   };
 
   useEffect(() => {
-    setContainer(document.getElementById(containerId));
+    const container = document.getElementById(containerId);
+    setContainer(container);
     fetchYearlyData();
-  }, [containerId]);
+  }, [containerId, fetchYearlyData]);
 
   const handleTabChange = (tabName) => {
     setActiveTab(tabName);
