@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/static/css/main.06dbb830.css",
-    "main.js": "/static/js/main.d7ec9d7d.js",
-    "index.html": "/index.html",
-    "main.06dbb830.css.map": "/static/css/main.06dbb830.css.map",
-    "main.d7ec9d7d.js.map": "/static/js/main.d7ec9d7d.js.map"
+    "main.css": "/california-wildfire-dashboard/static/css/main.577e585e.css",
+    "main.js": "/california-wildfire-dashboard/static/js/main.729e5cf8.js",
+    "index.html": "/california-wildfire-dashboard/index.html",
+    "main.577e585e.css.map": "/california-wildfire-dashboard/static/css/main.577e585e.css.map",
+    "main.729e5cf8.js.map": "/california-wildfire-dashboard/static/js/main.729e5cf8.js.map"
   },
   "entrypoints": [
-    "static/css/main.06dbb830.css",
-    "static/js/main.d7ec9d7d.js"
+    "static/css/main.577e585e.css",
+    "static/js/main.729e5cf8.js"
   ]
 }
