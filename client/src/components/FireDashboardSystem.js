@@ -233,16 +233,7 @@ const FireDashboardSystem = ({ containerId }) => {
     };
   };
 
-  useEffect(() => {
-    const container = document.getElementById(containerId);
-    setContainer(container);
-    fetchYearlyData();
-  }, [containerId, fetchYearlyData]);
-
-  const handleTabChange = (tabName) => {
-    setActiveTab(tabName);
-  };
-
+  
   const fetchYearlyData = async () => {
     setLoading(true);
     setError(null);
@@ -511,6 +502,17 @@ const FireDashboardSystem = ({ containerId }) => {
       setEmptyMonthlyData();
     }
   };
+
+  useEffect(() => {
+    const container = document.getElementById(containerId);
+    setContainer(container);
+    fetchYearlyData();
+  }, [containerId, fetchYearlyData]);
+
+  const handleTabChange = (tabName) => {
+    setActiveTab(tabName);
+  };
+
 
   const handleYearChange = (year) => {
     setSelectedYear(year);

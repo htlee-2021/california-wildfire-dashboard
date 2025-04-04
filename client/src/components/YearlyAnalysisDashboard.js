@@ -16,11 +16,7 @@ export const EnhancedYearlyAnalysisDashboard = ({
   const monthlyFiresChartRef = useRef(null);
   const [selectedMetric, setSelectedMetric] = useState('fires'); // 'fires' or 'acres'
 
-  useEffect(() => {
-    if (monthlyData.length > 0) {
-      createCharts();
-    }
-  }, [monthlyData, selectedYear, createCharts]);
+  
 
   // Format large numbers
   const formatLargeNumber = (num) => {
@@ -340,6 +336,11 @@ export const EnhancedYearlyAnalysisDashboard = ({
           .style('opacity', 0);
       });
   };
+  useEffect(() => {
+    if (monthlyData.length > 0) {
+      createCharts();
+    }
+  }, [monthlyData, selectedYear, createCharts]);
 
   const selectedYearData = getSelectedYearData();
 

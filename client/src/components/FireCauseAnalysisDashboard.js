@@ -15,19 +15,7 @@ export const FireCauseAnalysisDashboard = ({
     const monthlyCausesChartRef = useRef(null);
     const [selectedCause, setSelectedCause] = useState(null);
     const [showAllCauses, setShowAllCauses] = useState(false);
-
-    useEffect(() => {
-        if (topCauses && topCauses.length > 0) {
-          createTopCausesChart();
-        }
-      }, [topCauses, showAllCauses, createTopCausesChart]);
-
-    useEffect(() => {
-        if (causesData && selectedYear && causesData[selectedYear]) {
-            createCausesByYearChart();
-            createMonthlyCausesChart();
-        }
-    }, [causesData, selectedYear, selectedCause]);
+    
 
     // Format large numbers
     const formatLargeNumber = (num) => {
@@ -668,6 +656,18 @@ export const FireCauseAnalysisDashboard = ({
                 });
         }
     };
+    useEffect(() => {
+        if (causesData && selectedYear && causesData[selectedYear]) {
+            createCausesByYearChart();
+            createMonthlyCausesChart();
+        }
+    }, [causesData, selectedYear, selectedCause]);
+
+    useEffect(() => {
+        if (topCauses && topCauses.length > 0) {
+          createTopCausesChart();
+        }
+      }, [topCauses, showAllCauses, createTopCausesChart]);
 
     // Create a table of fire causes with their descriptions
     const renderCauseDefinitionsTable = () => {

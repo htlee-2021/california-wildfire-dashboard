@@ -10,11 +10,7 @@ export const RadialBarChart = ({
   const radialChartRef = useRef(null);
   const [focusYears, setFocusYears] = useState(5); // Default to showing 5 years
   
-  useEffect(() => {
-    if (monthlyDataByYear && Object.keys(monthlyDataByYear).length > 0) {
-      createRadialBarChart();
-    }
-  }, [monthlyDataByYear, selectedMetric, availableYears, focusYears, createRadialBarChart]);
+  
   
   const formatLargeNumber = (num) => {
     if (num >= 1000000) {
@@ -348,7 +344,11 @@ export const RadialBarChart = ({
     
 
     
-    
+    useEffect(() => {
+      if (monthlyDataByYear && Object.keys(monthlyDataByYear).length > 0) {
+        createRadialBarChart();
+      }
+    }, [monthlyDataByYear, selectedMetric, availableYears, focusYears, createRadialBarChart]);
     
     
     

@@ -57,12 +57,7 @@ export const TemperatureFireCorrelation = ({ onRefresh }) => {
   };
 
   
-  useEffect(() => {
-    if (data.length > 0) {
-      createScatterplot();
-      createHeatmap();
-    }
-  }, [data, createScatterplot, createHeatmap]);
+  
   
   const createScatterplot = () => {
     if (!scatterplotRef.current) return;
@@ -513,6 +508,13 @@ export const TemperatureFireCorrelation = ({ onRefresh }) => {
       
   };
   
+  useEffect(() => {
+    if (data.length > 0) {
+      createScatterplot();
+      createHeatmap();
+    }
+  }, [data, createScatterplot, createHeatmap]);
+
   // Calculate the correlation interpretation
   const getCorrelationInterpretation = (correlation) => {
     const absCorrelation = Math.abs(correlation);
