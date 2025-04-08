@@ -1,4 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+// FIXED VERSION OF YearlyAnalysisDashboard.js
+// This addresses the useCallback issue for getMonthByYearData
+
+import React, { useEffect, useRef, useState, useCallback } from 'react'; // FIXED: Added useCallback import
 import * as d3 from 'd3';
 import { RadialBarChart } from './RadialBarChart';
 
@@ -27,13 +30,13 @@ export const EnhancedYearlyAnalysisDashboard = ({
   };
 
   // Get the data for the selected year
-  const getSelectedYearData = () => {
+  const getSelectedYearData = useCallback(() => {
     if (!yearlyData || yearlyData.length === 0 || !selectedYear) return null;
     return yearlyData.find(data => data.year === selectedYear);
-  };
+  }, [yearlyData, selectedYear]); // FIXED: Added useCallback
 
-  // Get monthly data
-  const getMonthByYearData = () => {
+  // FIXED: Move getMonthByYearData to useCallback to prevent recreation on every render
+  const getMonthByYearData = useCallback(() => {
     if (!monthlyData || monthlyData.length === 0) return [];
 
     const months = [
@@ -54,7 +57,7 @@ export const EnhancedYearlyAnalysisDashboard = ({
     });
 
     return data;
-  };
+  }, [monthlyData]); // Add monthlyData as dependency
 
   function getResponsiveWidth(svgElement) {
     // Get the width of the container, not the SVG element itself
