@@ -1,5 +1,6 @@
 // FIXED VERSION OF FireCauseAnalysisDashboard.js
 // This addresses the missing dependencies in the useCallback hooks
+// and fixes the unused renderCauseDefinitionsTable function
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as d3 from 'd3';
@@ -18,6 +19,7 @@ export const FireCauseAnalysisDashboard = ({
     const monthlyCausesChartRef = useRef(null);
     const [selectedCause, setSelectedCause] = useState(null);
     const [showAllCauses, setShowAllCauses] = useState(false);
+    const [showCauseDefinitions, setShowCauseDefinitions] = useState(false);
     
     // Format large numbers
     const formatLargeNumber = (num) => {
@@ -663,81 +665,82 @@ export const FireCauseAnalysisDashboard = ({
             }
         }, [causesData, selectedYear, selectedCause, causeDefinitions, getCauseColor]); // FIXED: Added getCauseColor
     
-        useEffect(() => {
-            if (causesData && selectedYear && causesData[selectedYear]) {
-                createCausesByYearChart();
-                createMonthlyCausesChart();
-            }
-        }, [causesData, selectedYear, selectedCause, createCausesByYearChart, createMonthlyCausesChart]);
-    
-        useEffect(() => {
-            if (topCauses && topCauses.length > 0) {
-              createTopCausesChart();
-            }
-          }, [topCauses, showAllCauses, createTopCausesChart]);
-    
-        // Create a table of fire causes with their descriptions
-        const renderCauseDefinitionsTable = () => {
-            return (
-                <div className="chart-container">
-                    <h3 className="section-title">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="section-icon" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                        </svg>
-                        Fire Cause Reference Guide
-                    </h3>
-                    <div className="chart-description">
-                        Reference of fire cause codes and their definitions as per CAL FIRE classification.
-                    </div>
-                    <div className="data-table">
-                        <table className="monthly-table">
-                            <thead>
-                                <tr>
-                                    <th>Code</th>
-                                    <th>Cause Name</th>
-                                    <th>Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {Object.entries(causeDefinitions).map(([code, name]) => (
-                                    <tr key={code}>
-                                        <td>{code}</td>
-                                        <td>{name}</td>
-                                        <td>{getCauseDescription(parseInt(code))}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+    useEffect(() => {
+        if (causesData && selectedYear && causesData[selectedYear]) {
+            createCausesByYearChart();
+            createMonthlyCausesChart();
+        }
+    }, [causesData, selectedYear, selectedCause, createCausesByYearChart, createMonthlyCausesChart]);
+
+    useEffect(() => {
+        if (topCauses && topCauses.length > 0) {
+          createTopCausesChart();
+        }
+    }, [topCauses, showAllCauses, createTopCausesChart]);
+
+    // Create a table of fire causes with their descriptions
+    // FIXED: Now we're using this function in the JSX
+    const renderCauseDefinitionsTable = () => {
+        return (
+            <div className="chart-container">
+                <h3 className="section-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="section-icon" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                    Fire Cause Reference Guide
+                </h3>
+                <div className="chart-description">
+                    Reference of fire cause codes and their definitions as per CAL FIRE classification.
                 </div>
-            );
-        };
-    
-        // Helper function to provide descriptions for fire causes
-        const getCauseDescription = (causeId) => {
-            switch (causeId) {
-                case 1: return "Fires caused by natural lightning strikes.";
-                case 2: return "Fires caused by equipment use, such as chainsaws, tractors, or other machinery.";
-                case 3: return "Fires caused by improperly discarded cigarettes, cigars, or other smoking materials.";
-                case 4: return "Fires that escape from recreational or warming campfires.";
-                case 5: return "Fires from burning of yard waste or other debris that escape control.";
-                case 6: return "Fires caused by railroad operations, such as sparks from train wheels or maintenance.";
-                case 7: return "Fires intentionally set by individuals with malicious intent.";
-                case 8: return "Fires caused by children or others playing with matches, lighters, or fire.";
-                case 9: return "Fires that don't fall into other specific categories.";
-                case 10: return "Fires caused by vehicles, including exhaust systems, catalytic converters, or accidents.";
-                case 11: return "Fires caused by electrical power lines or related equipment.";
-                case 12: return "Fires that occur during official firefighter training exercises.";
-                case 13: return "Fires that occur during non-firefighter training exercises or activities.";
-                case 14: return "Fires where the cause could not be determined after investigation.";
-                case 15: return "Fires that start from structures and spread to wildland areas.";
-                case 16: return "Fires caused by aircraft crashes or related incidents.";
-                case 17: return "Fires caused by volcanic activity.";
-                case 18: return "Controlled burns that escape their intended boundaries.";
-                case 19: return "Fires specifically linked to campfires made by undocumented immigrants.";
-                default: return "No description available.";
-            }
-        };
+                <div className="data-table">
+                    <table className="monthly-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Cause Name</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {Object.entries(causeDefinitions).map(([code, name]) => (
+                                <tr key={code}>
+                                    <td>{code}</td>
+                                    <td>{name}</td>
+                                    <td>{getCauseDescription(parseInt(code))}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        );
+    };
+
+    // Helper function to provide descriptions for fire causes
+    const getCauseDescription = (causeId) => {
+        switch (causeId) {
+            case 1: return "Fires caused by natural lightning strikes.";
+            case 2: return "Fires caused by equipment use, such as chainsaws, tractors, or other machinery.";
+            case 3: return "Fires caused by improperly discarded cigarettes, cigars, or other smoking materials.";
+            case 4: return "Fires that escape from recreational or warming campfires.";
+            case 5: return "Fires from burning of yard waste or other debris that escape control.";
+            case 6: return "Fires caused by railroad operations, such as sparks from train wheels or maintenance.";
+            case 7: return "Fires intentionally set by individuals with malicious intent.";
+            case 8: return "Fires caused by children or others playing with matches, lighters, or fire.";
+            case 9: return "Fires that don't fall into other specific categories.";
+            case 10: return "Fires caused by vehicles, including exhaust systems, catalytic converters, or accidents.";
+            case 11: return "Fires caused by electrical power lines or related equipment.";
+            case 12: return "Fires that occur during official firefighter training exercises.";
+            case 13: return "Fires that occur during non-firefighter training exercises or activities.";
+            case 14: return "Fires where the cause could not be determined after investigation.";
+            case 15: return "Fires that start from structures and spread to wildland areas.";
+            case 16: return "Fires caused by aircraft crashes or related incidents.";
+            case 17: return "Fires caused by volcanic activity.";
+            case 18: return "Controlled burns that escape their intended boundaries.";
+            case 19: return "Fires specifically linked to campfires made by undocumented immigrants.";
+            default: return "No description available.";
+        }
+    };
     
         return (
             <div className="fire-causes-dashboard">
