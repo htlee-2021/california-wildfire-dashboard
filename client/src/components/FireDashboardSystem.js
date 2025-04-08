@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { MainDashboard } from './MainDashboard';
 import { EnhancedYearlyAnalysisDashboard } from './YearlyAnalysisDashboard';
 import { FireCauseAnalysisDashboard } from './FireCauseAnalysisDashboard';
@@ -8,7 +8,8 @@ import './FireDashboard.css';
 import './TableauDashboard.css';
 
 const FireDashboardSystem = ({ containerId }) => {
-  const [container, setContainer] = useState(null);
+  // Changed to not use the container value directly - eliminating unused var warning
+  const [, setContainer] = useState(null);
   const [activeTab, setActiveTab] = useState('main');
   const [yearlyData, setYearlyData] = useState([]);
   const [monthlyData, setMonthlyData] = useState([]);
@@ -233,8 +234,7 @@ const FireDashboardSystem = ({ containerId }) => {
     };
   };
 
-  
-  const fetchYearlyData = async () => {
+  const fetchYearlyData = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -347,9 +347,11 @@ const FireDashboardSystem = ({ containerId }) => {
       console.error("Error fetching yearly fire data:", err);
       handleDataError("Failed to load fire data. Please ensure data files are available in the public/data directory.");
     }
-  };
+  }, []);
 
-  // Load temperature-fire correlation data
+  // Not using this function, so we can safely remove it
+  // Keep commented for reference but not used to avoid warning
+  /*
   const fetchTempFireData = async () => {
     try {
       const response = await fetch(`${dataBaseUrl}/temperature-fire-correlation.json`);
@@ -365,8 +367,9 @@ const FireDashboardSystem = ({ containerId }) => {
       return null;
     }
   };
+  */
 
-  const fetchMonthlyData = async (year) => {
+  const fetchMonthlyData = useCallback(async (year) => {
     if (error || !year) {
       setEmptyMonthlyData();
       return;
@@ -379,7 +382,9 @@ const FireDashboardSystem = ({ containerId }) => {
         
         // Calculate summary stats
         const monthData = monthlyDataByYear[year];
+        /* Unused variable
         const totalFires = monthData.reduce((sum, month) => sum + month.fires, 0);
+        */
         const totalAcres = monthData.reduce((sum, month) => sum + month.acres, 0);
         
         // Find peak month
@@ -501,7 +506,7 @@ const FireDashboardSystem = ({ containerId }) => {
       setError(`Failed to load monthly data for ${year}.`);
       setEmptyMonthlyData();
     }
-  };
+  }, [error, monthlyData.length, monthlyDataByYear]);
 
   useEffect(() => {
     const container = document.getElementById(containerId);
@@ -513,11 +518,10 @@ const FireDashboardSystem = ({ containerId }) => {
     setActiveTab(tabName);
   };
 
-
-  const handleYearChange = (year) => {
+  const handleYearChange = useCallback((year) => {
     setSelectedYear(year);
     fetchMonthlyData(year);
-  };
+  }, [fetchMonthlyData]);
 
   const handleDataError = (errorMessage) => {
     setYearlyData([]);
@@ -702,7 +706,6 @@ const FireDashboardSystem = ({ containerId }) => {
       </div>
     </div>
   );
-
-}
+};
 
 export default FireDashboardSystem;

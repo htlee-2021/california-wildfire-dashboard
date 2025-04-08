@@ -136,7 +136,8 @@ const TableauDashboard = ({
   useEffect(() => {
     const checkTableauAPIAccess = async () => {
       try {
-        const response = await fetch('https://public.tableau.com/javascripts/api/viz_v1.js', {
+        // Using no-cors mode just to check if API is accessible
+        await fetch('https://public.tableau.com/javascripts/api/viz_v1.js', {
           method: 'HEAD',
           mode: 'no-cors' // This allows us to at least try the request
         });
@@ -204,8 +205,7 @@ const TableauDashboard = ({
                 <div className="error-details">
                   <p>{error}</p>
                   <p style={{ marginTop: '10px', fontStyle: 'italic' }}>
-                    This might happen if your browser is blocking access to Tableau Public
-                    or if your internet connection is interrupted.
+                  This might happen if your browser is blocking access to Tableau Public or if your internet connection is interrupted.
                   </p>
                 </div>
                 <button 

@@ -19,13 +19,7 @@ export const RadialBarChart = ({
     return num;
   };
   
-  useEffect(() => {
-    if (monthlyDataByYear && Object.keys(monthlyDataByYear).length > 0) {
-      createRadialBarChart();
-    }
-  }, [monthlyDataByYear, selectedMetric, availableYears, focusYears]);
-  
-  const createRadialBarChart = () => {
+  const createRadialBarChart = React.useCallback(() => {
     if (!radialChartRef.current) return;
     
     // Clear previous chart
@@ -343,7 +337,13 @@ export const RadialBarChart = ({
       const monthData = processedData.filter(d => d.monthIndex === monthIndex);
       summerMaxes[month] = d3.max(monthData, d => d.value);
     });
-  };
+  }, [availableYears, focusYears, monthlyDataByYear, selectedMetric]); // Added proper dependencies
+  
+  useEffect(() => {
+    if (monthlyDataByYear && Object.keys(monthlyDataByYear).length > 0) {
+      createRadialBarChart();
+    }
+  }, [monthlyDataByYear, selectedMetric, availableYears, focusYears, createRadialBarChart]);
   
   return (
     <div className="chart-container">

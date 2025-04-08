@@ -16,8 +16,6 @@ export const EnhancedYearlyAnalysisDashboard = ({
   const monthlyFiresChartRef = useRef(null);
   const [selectedMetric, setSelectedMetric] = useState('fires'); // 'fires' or 'acres'
 
-  
-
   // Format large numbers
   const formatLargeNumber = (num) => {
     if (num >= 1000000) {
@@ -68,279 +66,278 @@ export const EnhancedYearlyAnalysisDashboard = ({
     return containerWidth - 40; // 20px padding on each side
   }
 
-  const createCharts = () => {
-    createMonthlyAcresChart();
-    createMonthlyFiresChart();
-  };
-
-  const createMonthlyAcresChart = () => {
-    const data = getMonthByYearData();
-    if (data.length === 0 || !monthlyAcresChartRef.current) return;
-
-    const margin = { top: 40, right: 30, bottom: 100, left: 60 };
-    const svgElement = monthlyAcresChartRef.current;
-    const width = getResponsiveWidth(svgElement);
-    const height = 400;
-    const chartWidth = width - margin.left - margin.right;
-    const chartHeight = height - margin.top - margin.bottom;
-
-    // Clear any existing SVG
-    d3.select(svgElement).selectAll('*').remove();
-
-    // Create SVG
-    const svg = d3.select(svgElement)
-      .attr('width', width)
-      .attr('height', height)
-      .append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
-
-    // Define scales
-    const xScale = d3.scaleBand()
-      .domain(data.map(d => d.month))
-      .range([0, chartWidth])
-      .padding(0.2);
-
-    const yScale = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.acres) * 1.1])
-      .range([chartHeight, 0]);
-
-    // Create axes
-    svg.append('g')
-      .attr('transform', `translate(0,${chartHeight})`)
-      .call(d3.axisBottom(xScale))
-      .selectAll('text')
-      .attr('transform', 'rotate(-45)')
-      .style('text-anchor', 'end')
-      .attr('dx', '-.8em')
-      .attr('dy', '.15em');
-
-    svg.append('g')
-      .call(d3.axisLeft(yScale).tickFormat(d => formatLargeNumber(d)));
-
-    // Add grid lines
-    svg.append('g')
-      .attr('class', 'grid-lines')
-      .selectAll('line')
-      .data(yScale.ticks())
-      .enter()
-      .append('line')
-      .attr('x1', 0)
-      .attr('y1', d => yScale(d))
-      .attr('x2', chartWidth)
-      .attr('y2', d => yScale(d))
-      .attr('stroke', '#e5e7eb')
-      .attr('stroke-dasharray', '3,3');
-
-    // Add bars
-    svg.selectAll('bars')
-      .data(data)
-      .enter()
-      .append('rect')
-      .attr('x', d => xScale(d.month))
-      .attr('y', d => yScale(d.acres))
-      .attr('width', xScale.bandwidth())
-      .attr('height', d => chartHeight - yScale(d.acres))
-      .attr('fill', '#DC2626')
-      .attr('rx', 4)
-      .attr('ry', 4);
-
-    // Add labels for high values
-    svg.selectAll('value-labels')
-      .data(data.filter(d => d.acres > 10000)) // Only label high values
-      .enter()
-      .append('text')
-      .attr('x', d => xScale(d.month) + xScale.bandwidth() / 2)
-      .attr('y', d => yScale(d.acres) - 5)
-      .attr('text-anchor', 'middle')
-      .text(d => formatLargeNumber(d.acres))
-      .style('font-size', '12px')
-      .style('fill', '#6B7280');
-
-    // Add title
-    svg.append('text')
-      .attr('x', chartWidth / 2)
-      .attr('y', -10)
-      .attr('text-anchor', 'middle')
-      .style('font-size', '16px')
-      .style('font-weight', 'bold')
-      .text(`Acres Burned by Month in ${selectedYear}`);
-
-    // Create tooltip
-    const tooltip = d3.select('body')
-      .selectAll('.tooltip')
-      .data([null])
-      .join('div')
-      .attr('class', 'tooltip')
-      .style('opacity', 0);
-
-    // Add hover effects
-    svg.selectAll('rect')
-      .on('mouseover', function (event, d) {
-        d3.select(this)
-          .transition()
-          .duration(200)
-          .attr('opacity', 0.8);
-
-        tooltip.transition()
-          .duration(200)
-          .style('opacity', 0.9);
-
-        tooltip.html(`
-          <strong>${d.month} ${selectedYear}</strong><br/>
-          Acres Burned: ${d.acres.toLocaleString()}<br/>
-          Fires: ${d.fires.toLocaleString()}<br/>
-          ${d.fires > 0 ? `Acres per Fire: ${Math.round(d.acres / d.fires).toLocaleString()}` : ''}
-        `)
-          .style('left', (event.pageX + 10) + 'px')
-          .style('top', (event.pageY - 28) + 'px');
-      })
-      .on('mouseout', function () {
-        d3.select(this)
-          .transition()
-          .duration(200)
-          .attr('opacity', 1);
-
-        tooltip.transition()
-          .duration(500)
-          .style('opacity', 0);
-      });
-  };
-
-  const createMonthlyFiresChart = () => {
-    const data = getMonthByYearData();
-    if (data.length === 0 || !monthlyFiresChartRef.current) return;
-
-    const margin = { top: 40, right: 30, bottom: 100, left: 60 };
-    const svgElement = monthlyFiresChartRef.current;
-    const width = getResponsiveWidth(svgElement);
-    const height = 400;
-    const chartWidth = width - margin.left - margin.right;
-    const chartHeight = height - margin.top - margin.bottom;
-
-    // Clear any existing SVG
-    d3.select(svgElement).selectAll('*').remove();
-
-    // Create SVG
-    const svg = d3.select(svgElement)
-      .attr('width', width)
-      .attr('height', height)
-      .append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
-
-    // Define scales
-    const xScale = d3.scaleBand()
-      .domain(data.map(d => d.month))
-      .range([0, chartWidth])
-      .padding(0.4);
-
-    const yScale = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.fires) * 1.1])
-      .range([chartHeight, 0]);
-
-    // Create axes
-    svg.append('g')
-      .attr('transform', `translate(0,${chartHeight})`)
-      .call(d3.axisBottom(xScale))
-      .selectAll('text')
-      .attr('transform', 'rotate(-45)')
-      .style('text-anchor', 'end')
-      .attr('dx', '-.8em')
-      .attr('dy', '.15em');
-
-    svg.append('g')
-      .call(d3.axisLeft(yScale));
-
-    // Add grid lines
-    svg.append('g')
-      .attr('class', 'grid-lines')
-      .selectAll('line')
-      .data(yScale.ticks())
-      .enter()
-      .append('line')
-      .attr('x1', 0)
-      .attr('y1', d => yScale(d))
-      .attr('x2', chartWidth)
-      .attr('y2', d => yScale(d))
-      .attr('stroke', '#e5e7eb')
-      .attr('stroke-dasharray', '3,3');
-
-    // Create line generator
-    const lineGenerator = d3.line()
-      .x(d => xScale(d.month) + xScale.bandwidth() / 2)
-      .y(d => yScale(d.fires));
-
-    // Add the line
-    svg.append('path')
-      .datum(data)
-      .attr('fill', 'none')
-      .attr('stroke', '#3B82F6')
-      .attr('stroke-width', 3)
-      .attr('d', lineGenerator);
-
-    // Add dots
-    svg.selectAll('dots')
-      .data(data)
-      .enter()
-      .append('circle')
-      .attr('cx', d => xScale(d.month) + xScale.bandwidth() / 2)
-      .attr('cy', d => yScale(d.fires))
-      .attr('r', 5)
-      .attr('fill', '#3B82F6');
-
-    // Add title
-    svg.append('text')
-      .attr('x', chartWidth / 2)
-      .attr('y', -10)
-      .attr('text-anchor', 'middle')
-      .style('font-size', '16px')
-      .style('font-weight', 'bold')
-      .text(`Fire Counts by Month in ${selectedYear}`);
-
-    // Create tooltip
-    const tooltip = d3.select('body')
-      .selectAll('.tooltip')
-      .data([null])
-      .join('div')
-      .attr('class', 'tooltip')
-      .style('opacity', 0);
-
-    // Add hover effects
-    svg.selectAll('circle')
-      .on('mouseover', function (event, d) {
-        d3.select(this)
-          .transition()
-          .duration(200)
-          .attr('r', 7);
-
-        tooltip.transition()
-          .duration(200)
-          .style('opacity', 0.9);
-
-        tooltip.html(`
-          <strong>${d.month} ${selectedYear}</strong><br/>
-          Fires: ${d.fires.toLocaleString()}<br/>
-          Acres Burned: ${d.acres.toLocaleString()}<br/>
-          ${d.fires > 0 ? `Acres per Fire: ${Math.round(d.acres / d.fires).toLocaleString()}` : ''}
-        `)
-          .style('left', (event.pageX + 10) + 'px')
-          .style('top', (event.pageY - 28) + 'px');
-      })
-      .on('mouseout', function () {
-        d3.select(this)
-          .transition()
-          .duration(200)
-          .attr('r', 5);
-
-        tooltip.transition()
-          .duration(500)
-          .style('opacity', 0);
-      });
-  };
   useEffect(() => {
     if (monthlyData.length > 0) {
-      createCharts();
+      // Move createCharts inside useEffect to avoid dependency issues
+      const createMonthlyAcresChart = () => {
+        const data = getMonthByYearData();
+        if (data.length === 0 || !monthlyAcresChartRef.current) return;
+
+        const margin = { top: 40, right: 30, bottom: 100, left: 60 };
+        const svgElement = monthlyAcresChartRef.current;
+        const width = getResponsiveWidth(svgElement);
+        const height = 400;
+        const chartWidth = width - margin.left - margin.right;
+        const chartHeight = height - margin.top - margin.bottom;
+
+        // Clear any existing SVG
+        d3.select(svgElement).selectAll('*').remove();
+
+        // Create SVG
+        const svg = d3.select(svgElement)
+          .attr('width', width)
+          .attr('height', height)
+          .append('g')
+          .attr('transform', `translate(${margin.left},${margin.top})`);
+
+        // Define scales
+        const xScale = d3.scaleBand()
+          .domain(data.map(d => d.month))
+          .range([0, chartWidth])
+          .padding(0.2);
+
+        const yScale = d3.scaleLinear()
+          .domain([0, d3.max(data, d => d.acres) * 1.1])
+          .range([chartHeight, 0]);
+
+        // Create axes
+        svg.append('g')
+          .attr('transform', `translate(0,${chartHeight})`)
+          .call(d3.axisBottom(xScale))
+          .selectAll('text')
+          .attr('transform', 'rotate(-45)')
+          .style('text-anchor', 'end')
+          .attr('dx', '-.8em')
+          .attr('dy', '.15em');
+
+        svg.append('g')
+          .call(d3.axisLeft(yScale).tickFormat(d => formatLargeNumber(d)));
+
+        // Add grid lines
+        svg.append('g')
+          .attr('class', 'grid-lines')
+          .selectAll('line')
+          .data(yScale.ticks())
+          .enter()
+          .append('line')
+          .attr('x1', 0)
+          .attr('y1', d => yScale(d))
+          .attr('x2', chartWidth)
+          .attr('y2', d => yScale(d))
+          .attr('stroke', '#e5e7eb')
+          .attr('stroke-dasharray', '3,3');
+
+        // Add bars
+        svg.selectAll('bars')
+          .data(data)
+          .enter()
+          .append('rect')
+          .attr('x', d => xScale(d.month))
+          .attr('y', d => yScale(d.acres))
+          .attr('width', xScale.bandwidth())
+          .attr('height', d => chartHeight - yScale(d.acres))
+          .attr('fill', '#DC2626')
+          .attr('rx', 4)
+          .attr('ry', 4);
+
+        // Add labels for high values
+        svg.selectAll('value-labels')
+          .data(data.filter(d => d.acres > 10000)) // Only label high values
+          .enter()
+          .append('text')
+          .attr('x', d => xScale(d.month) + xScale.bandwidth() / 2)
+          .attr('y', d => yScale(d.acres) - 5)
+          .attr('text-anchor', 'middle')
+          .text(d => formatLargeNumber(d.acres))
+          .style('font-size', '12px')
+          .style('fill', '#6B7280');
+
+        // Add title
+        svg.append('text')
+          .attr('x', chartWidth / 2)
+          .attr('y', -10)
+          .attr('text-anchor', 'middle')
+          .style('font-size', '16px')
+          .style('font-weight', 'bold')
+          .text(`Acres Burned by Month in ${selectedYear}`);
+
+        // Create tooltip
+        const tooltip = d3.select('body')
+          .selectAll('.tooltip')
+          .data([null])
+          .join('div')
+          .attr('class', 'tooltip')
+          .style('opacity', 0);
+
+        // Add hover effects
+        svg.selectAll('rect')
+          .on('mouseover', function (event, d) {
+            d3.select(this)
+              .transition()
+              .duration(200)
+              .attr('opacity', 0.8);
+
+            tooltip.transition()
+              .duration(200)
+              .style('opacity', 0.9);
+
+            tooltip.html(`
+              <strong>${d.month} ${selectedYear}</strong><br/>
+              Acres Burned: ${d.acres.toLocaleString()}<br/>
+              Fires: ${d.fires.toLocaleString()}<br/>
+              ${d.fires > 0 ? `Acres per Fire: ${Math.round(d.acres / d.fires).toLocaleString()}` : ''}
+            `)
+              .style('left', (event.pageX + 10) + 'px')
+              .style('top', (event.pageY - 28) + 'px');
+          })
+          .on('mouseout', function () {
+            d3.select(this)
+              .transition()
+              .duration(200)
+              .attr('opacity', 1);
+
+            tooltip.transition()
+              .duration(500)
+              .style('opacity', 0);
+          });
+      };
+
+      const createMonthlyFiresChart = () => {
+        const data = getMonthByYearData();
+        if (data.length === 0 || !monthlyFiresChartRef.current) return;
+
+        const margin = { top: 40, right: 30, bottom: 100, left: 60 };
+        const svgElement = monthlyFiresChartRef.current;
+        const width = getResponsiveWidth(svgElement);
+        const height = 400;
+        const chartWidth = width - margin.left - margin.right;
+        const chartHeight = height - margin.top - margin.bottom;
+
+        // Clear any existing SVG
+        d3.select(svgElement).selectAll('*').remove();
+
+        // Create SVG
+        const svg = d3.select(svgElement)
+          .attr('width', width)
+          .attr('height', height)
+          .append('g')
+          .attr('transform', `translate(${margin.left},${margin.top})`);
+
+        // Define scales
+        const xScale = d3.scaleBand()
+          .domain(data.map(d => d.month))
+          .range([0, chartWidth])
+          .padding(0.4);
+
+        const yScale = d3.scaleLinear()
+          .domain([0, d3.max(data, d => d.fires) * 1.1])
+          .range([chartHeight, 0]);
+
+        // Create axes
+        svg.append('g')
+          .attr('transform', `translate(0,${chartHeight})`)
+          .call(d3.axisBottom(xScale))
+          .selectAll('text')
+          .attr('transform', 'rotate(-45)')
+          .style('text-anchor', 'end')
+          .attr('dx', '-.8em')
+          .attr('dy', '.15em');
+
+        svg.append('g')
+          .call(d3.axisLeft(yScale));
+
+        // Add grid lines
+        svg.append('g')
+          .attr('class', 'grid-lines')
+          .selectAll('line')
+          .data(yScale.ticks())
+          .enter()
+          .append('line')
+          .attr('x1', 0)
+          .attr('y1', d => yScale(d))
+          .attr('x2', chartWidth)
+          .attr('y2', d => yScale(d))
+          .attr('stroke', '#e5e7eb')
+          .attr('stroke-dasharray', '3,3');
+
+        // Create line generator
+        const lineGenerator = d3.line()
+          .x(d => xScale(d.month) + xScale.bandwidth() / 2)
+          .y(d => yScale(d.fires));
+
+        // Add the line
+        svg.append('path')
+          .datum(data)
+          .attr('fill', 'none')
+          .attr('stroke', '#3B82F6')
+          .attr('stroke-width', 3)
+          .attr('d', lineGenerator);
+
+        // Add dots
+        svg.selectAll('dots')
+          .data(data)
+          .enter()
+          .append('circle')
+          .attr('cx', d => xScale(d.month) + xScale.bandwidth() / 2)
+          .attr('cy', d => yScale(d.fires))
+          .attr('r', 5)
+          .attr('fill', '#3B82F6');
+
+        // Add title
+        svg.append('text')
+          .attr('x', chartWidth / 2)
+          .attr('y', -10)
+          .attr('text-anchor', 'middle')
+          .style('font-size', '16px')
+          .style('font-weight', 'bold')
+          .text(`Fire Counts by Month in ${selectedYear}`);
+
+        // Create tooltip
+        const tooltip = d3.select('body')
+          .selectAll('.tooltip')
+          .data([null])
+          .join('div')
+          .attr('class', 'tooltip')
+          .style('opacity', 0);
+
+        // Add hover effects
+        svg.selectAll('circle')
+          .on('mouseover', function (event, d) {
+            d3.select(this)
+              .transition()
+              .duration(200)
+              .attr('r', 7);
+
+            tooltip.transition()
+              .duration(200)
+              .style('opacity', 0.9);
+
+            tooltip.html(`
+              <strong>${d.month} ${selectedYear}</strong><br/>
+              Fires: ${d.fires.toLocaleString()}<br/>
+              Acres Burned: ${d.acres.toLocaleString()}<br/>
+              ${d.fires > 0 ? `Acres per Fire: ${Math.round(d.acres / d.fires).toLocaleString()}` : ''}
+            `)
+              .style('left', (event.pageX + 10) + 'px')
+              .style('top', (event.pageY - 28) + 'px');
+          })
+          .on('mouseout', function () {
+            d3.select(this)
+              .transition()
+              .duration(200)
+              .attr('r', 5);
+
+            tooltip.transition()
+              .duration(500)
+              .style('opacity', 0);
+          });
+      };
+
+      // Create both charts
+      createMonthlyAcresChart();
+      createMonthlyFiresChart();
     }
-  }, [monthlyData, selectedYear, createCharts]);
+  }, [monthlyData, selectedYear, getMonthByYearData]);
 
   const selectedYearData = getSelectedYearData();
 

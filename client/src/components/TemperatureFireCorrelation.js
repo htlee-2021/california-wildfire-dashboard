@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as d3 from 'd3';
 
 export const TemperatureFireCorrelation = ({ onRefresh }) => {
@@ -56,10 +56,7 @@ export const TemperatureFireCorrelation = ({ onRefresh }) => {
     }
   };
 
-  
-  
-  
-  const createScatterplot = () => {
+  const createScatterplot = useCallback(() => {
     if (!scatterplotRef.current) return;
     
     // Clear previous chart
@@ -258,9 +255,9 @@ export const TemperatureFireCorrelation = ({ onRefresh }) => {
       .attr("font-size", "16px")
       .attr("font-weight", "bold")
       .text("Temperature vs. Fire Count Correlation");
-  };
+  }, [data]);
   
-  const createHeatmap = () => {
+  const createHeatmap = useCallback(() => {
     if (!heatmapRef.current || data.length < 5) return;
     
     // Clear previous chart
@@ -505,8 +502,7 @@ export const TemperatureFireCorrelation = ({ onRefresh }) => {
       .attr("font-size", "16px")
       .attr("font-weight", "bold")
       .text("Temperature vs. Fire Count Correlation");
-      
-  };
+  }, [data]);
   
   useEffect(() => {
     if (data.length > 0) {
