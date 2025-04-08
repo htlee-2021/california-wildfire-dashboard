@@ -10,8 +10,6 @@ export const RadialBarChart = ({
   const radialChartRef = useRef(null);
   const [focusYears, setFocusYears] = useState(5); // Default to showing 5 years
   
-  
-  
   const formatLargeNumber = (num) => {
     if (num >= 1000000) {
       return `${(num / 1000000).toFixed(1)}M`;
@@ -20,6 +18,12 @@ export const RadialBarChart = ({
     }
     return num;
   };
+  
+  useEffect(() => {
+    if (monthlyDataByYear && Object.keys(monthlyDataByYear).length > 0) {
+      createRadialBarChart();
+    }
+  }, [monthlyDataByYear, selectedMetric, availableYears, focusYears]);
   
   const createRadialBarChart = () => {
     if (!radialChartRef.current) return;
@@ -195,8 +199,6 @@ export const RadialBarChart = ({
       .attr("stroke-dasharray", "3,3")
       .attr("fill-opacity", 0.2);
     
-    
-    
     // Group data by year
     const dataByYear = d3.group(processedData, d => d.year);
     
@@ -341,17 +343,6 @@ export const RadialBarChart = ({
       const monthData = processedData.filter(d => d.monthIndex === monthIndex);
       summerMaxes[month] = d3.max(monthData, d => d.value);
     });
-    
-
-    
-    useEffect(() => {
-      if (monthlyDataByYear && Object.keys(monthlyDataByYear).length > 0) {
-        createRadialBarChart();
-      }
-    }, [monthlyDataByYear, selectedMetric, availableYears, focusYears, createRadialBarChart]);
-    
-    
-    
   };
   
   return (
